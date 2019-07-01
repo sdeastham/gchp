@@ -1474,14 +1474,26 @@ CONTAINS
                                                             __RC__ )
     ENDDO
 
-    ! LAI
-    CALL MAPL_AddImportSpec(GC,                                  &
-       SHORT_NAME         = 'XLAIMULTI',                         &
-       LONG_NAME          = 'LAI_by_type',                       &
-       UNITS              = 'cm2 cm-2',                          &
-       DIMS               = MAPL_DimsHorzVert,                   &
-       VLOCATION          = MAPL_VLocationEdge,                  &
+    !! LAI
+    !CALL MAPL_AddImportSpec(GC,                                  &
+    !   SHORT_NAME         = 'XLAIMULTI',                         &
+    !   LONG_NAME          = 'LAI_by_type',                       &
+    !   UNITS              = 'cm2 cm-2',                          &
+    !   DIMS               = MAPL_DimsHorzVert,                   &
+    !   VLOCATION          = MAPL_VLocationEdge,                  &
+    !                                                        __RC__ )
+
+    ! LAI, the old-fashioned way
+    Do T = 1, 73
+       landTypeInt = T-1
+       Write ( importName, '(a,I0.2)' ) 'XLAI', landTypeInt
+       CALL MAPL_AddImportSpec(GC,                                  &
+          SHORT_NAME         = importName,                          &
+          LONG_NAME          = 'XLAI_by_type',                      &
+          UNITS              = 'cm2_cm-2',                          &
+          DIMS               = MAPL_DimsHorzOnly,                   &
                                                             __RC__ )
+    End Do
 
     ! CHLR (chlorophyll-a, used in marine POA simulation only)
     !CALL MAPL_AddImportSpec(GC,                                  &
