@@ -447,6 +447,8 @@ contains
 
     logical                     :: isPresent
 
+    character(len=1023)          :: errmsg
+
 ! Begin
 !------
 
@@ -781,7 +783,8 @@ contains
                    exit
                 end if
              end DO
-             _ASSERT(found, 'search failed')
+             write(errmsg,'(4a)') 'Search failed for vector component ', trim(mCFIO%vectorList(1,k)), ' in CFIO ', trim(mCFIO%fName)
+             _ASSERT(found, trim(errmsg))
              mCFIO%needVar(I) = -J ! I am second component of the vector
           end if
        end DO
@@ -2881,6 +2884,8 @@ contains
     logical :: time_is_cyclic_
     logical :: cfioIsCreated
 
+    character(len=1023) :: errmsg
+
 !                              ---
     _UNUSED_DUMMY(FORCE_REGRID)
 
@@ -3108,7 +3113,9 @@ contains
                             exit
                          end if
                       END DO
-                      _ASSERT(found, 'search failed')
+                      !_ASSERT(found, 'search failed')
+                      write(errmsg,'(2a)') 'Search for level subrange failed in CFIO ', trim(filename)
+                      _ASSERT(found, trim(errmsg))
                    END DO
 
                 end if
@@ -5089,6 +5096,8 @@ CONTAINS
     type(ESMF_CFIO), pointer :: cfiop
     type(CFIOCollection), pointer :: collection
     character(len=255):: msg
+
+    character(len=1023) :: errmsg
 
     call ESMF_VMGetCurrent(vm,rc=status)
     _VERIFY(STATUS)
