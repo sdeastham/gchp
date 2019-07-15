@@ -2245,6 +2245,8 @@ CONTAINS
      logical                    :: found,lFound,intOK
      integer                    :: maxOffset
 
+     character(len=1023)        :: errMsg
+
      type(ESMF_TimeInterval)    :: zero
 
      call ESMF_TimeIntervalSet(zero,__RC__)
@@ -2306,12 +2308,16 @@ CONTAINS
               end if
            enddo
            if (.not.lfound) then
-              if (mapl_am_i_root()) write(*,*) 'From ',trim(item%file),'could not find file with extrapolation'
-              _ASSERT(.false.,'needs informative message')
+              !if (mapl_am_i_root()) write(*,*) 'From ',trim(item%file),'could not find file with extrapolation'
+              !_ASSERT(.false.,'needs informative message')
+              write(errmsg,'(3a)') 'From ', trim(item%file), ': could not find file with extrapolation'
+              _FAIL(Trim(errmsg))
            end if
         else
-           if (mapl_am_i_root()) write(*,*)'From ',trim(item%file),' could not find time no extrapolation',item%climYear
-           _ASSERT(.false.,'needs informative message')
+           !if (mapl_am_i_root()) write(*,*)'From ',trim(item%file),' could not find time no extrapolation',item%climYear
+           !_ASSERT(.false.,'needs informative message')
+           write(errmsg,'(3a,I0.4)') 'From ', trim(item%file), ': could not find time (no extrapolation); climatology year: ', item%climYear
+           _FAIL(Trim(errmsg))
         end if
 
      end if
@@ -2409,7 +2415,9 @@ CONTAINS
 
      type (ESMF_CFIO), pointer                  :: xCFIO
      type(ESMF_Time), allocatable               :: xTSeries(:)
-   
+  
+     character(len=1023)                        :: errmsg
+ 
      call ESMF_TimeIntervalSet(zero,__RC__)
      call ESMF_TimeIntervalSet(yrTimeStep, yy=1, rc=rc)
 
@@ -2436,17 +2444,21 @@ CONTAINS
         allocate(xTSeries(xCFIO%tSteps))
         call GetTimesOnFile(xCFIO,xTSeries,rc=status)
         If (status /= ESMF_SUCCESS) then
-           if (mapl_am_I_root()) Then
-              write(*,'(a,a)') ' ERROR: Time vector retrieval failed on fixed file ',trim(item%file)
-           end if
-           _RETURN(ESMF_FAILURE)
+           !if (mapl_am_I_root()) Then
+           !   write(*,'(a,a)') ' ERROR: Time vector retrieval failed on fixed file ',trim(item%file)
+           !end if
+           !_RETURN(ESMF_FAILURE)
+           write(errmsg,'(2a)') 'Time vector retrieval failed on fixed file ', trim(item%file)
+           _FAIL(Trim(errmsg))
         end if
         call GetBracketTimeOnSingleFile(xCFIO,xTSeries,cTime,bSide,UniFileClim,UniFileDOW,interpTime,fileTime,tindex,allowExtrap,item%climYear,rc=status)
         if (status /= ESMF_SUCCESS) then
-           if (mapl_am_I_root()) Then
-              write(*,'(a,a,a,a)') ' ERROR: Bracket timing request failed on fixed file ',trim(item%file),' for side ',bSide
-           end if
-           _RETURN(ESMF_FAILURE)
+           !if (mapl_am_I_root()) Then
+           !   write(*,'(a,a,a,a)') ' ERROR: Bracket timing request failed on fixed file ',trim(item%file),' for side ',bSide
+           !end if
+           !_RETURN(ESMF_FAILURE)
+           write(errmsg,'(4a)') 'Bracket timing request failed on fixed file ',trim(item%file),' for side ',bSide
+           _FAIL(Trim(errmsg))
         end if
      else
         if (mapl_am_I_root().and.(Ext_Debug > 0)) Then
@@ -2467,15 +2479,18 @@ CONTAINS
            !call ESMF_TimeSet(fTime,yy=item%climYear,mm=imm,dd=idd,h=ihr,m=imn,s=isc,__RC__)
         elseif (trim(item%cyclic)=='d') then
            ! Forbidden
-           Write(*,'(a,a,a)') 'ERROR: Day-of-week scaling factors must be given in a single file, but ',&
-              Trim(file_processed),' uses a refresh template'
-           _ASSERT(.False.,'needs informative message')
-
+           !Write(*,'(a,a,a)') 'ERROR: Day-of-week scaling factors must be given in a single file, but ',&
+           !   Trim(file_processed),' uses a refresh template'
+           !_ASSERT(.False.,'needs informative message')
+           write(errmsg,'(3a)') 'Day-of-week scaling factors must be given in a single file, but ', Trim(file_processed),' uses a refresh template'
+           _FAIL(Trim(errmsg))
         else
            yrOffset = 0
            if (item%reff_time > cTime) then
-              Write(*,'(a,a,a)') 'ERROR: Reference time for file ', Trim(item%file),' is too late'
-              _ASSERT(.False.,'needs informative message')
+              !Write(*,'(a,a,a)') 'ERROR: Reference time for file ', Trim(item%file),' is too late'
+              !_ASSERT(.False.,'needs informative message')
+              write(errmsg,'(3a)') 'Reference time for ', trim(item%file), ' is later than simulation time'
+              _FAIL(Trim(errmsg))
            end if
            ! This approach causes a problem if cTime and item%reff_time are too far
            ! apart - do it the hard way instead... 
@@ -2528,10 +2543,12 @@ CONTAINS
            ftime = item%reff_time
            call ESMF_TimeGet(item%reff_time,yy=refYear,__RC__)
            If (refYear.lt.1850) Then
-              if (mapl_am_I_root()) Then
-                 write(*,'(a,I0.4,a,a)') '            UpdateBracketTime: Reference year too early (', refYear, '). Aborting search for data from ',trim(item%file)
-              end if
-              _RETURN(ESMF_FAILURE)
+              !if (mapl_am_I_root()) Then
+              !   write(*,'(a,I0.4,a,a)') '            UpdateBracketTime: Reference year too early (', refYear, '). Aborting search for data from ',trim(item%file)
+              !end if
+              !_RETURN(ESMF_FAILURE)
+              write(errmsg,'(a,I0.4,2a)') 'Reference year ', refYear, ' is too early (<1850). Aborting search for data from ', trim(item%file)
+              _FAIL(Trim(errmsg))
            End If
            intOK = .True.
            found = .false.
@@ -2563,7 +2580,8 @@ CONTAINS
                  call ESMF_TimeGet(fTime,yy=iyr,mm=imm,dd=idd,h=ihr,m=imn,s=isc,__RC__)
                  Write(*,'(a,I0.4,5(a,I0.2))') '            ==> Last check    : ',iYr,'-',iMM,'-',iDD,' ',iHr,':',iMn,':',iSc
               end if
-              _RETURN(ESMF_FAILURE)
+              write(errmsg,'(2a)') 'Could not find data within maximum offset range from ', trim(item%file)
+              _FAIL(Trim(errmsg))
            End If
           ! Generate CFIO
            call MakeCFIO(file_processed,item%collection_id,xCFIO,msg=trim(IAM),rc=status)
@@ -2608,10 +2626,12 @@ CONTAINS
               call gx_(file_processed,item%file,nymd=curDate,nhms=curTime,__STAT__)
               Inquire(FILE=trim(file_processed),EXIST=found)
               If (.not.found) Then
-                 if (mapl_am_I_root()) Then
-                    write(*,'(a,a,a,a)') ' ERROR: Failed to project data from ',trim(item%file),' for side ',bSide
-                 end if
-                 _RETURN(ESMF_FAILURE)
+                 !if (mapl_am_I_root()) Then
+                 !   write(*,'(a,a,a,a)') ' ERROR: Failed to project data from ',trim(item%file),' for side ',bSide
+                 !end if
+                 !_RETURN(ESMF_FAILURE)
+                 write(errmsg,'(4a)') 'Failed to project data from ',trim(item%file),' for side ',bSide
+                 _FAIL(Trim(errmsg))
               End If
            ElseIf (RExtrap.or.(RExact.and.RSide)) Then
               if (mapl_am_I_root().and.(Ext_Debug > 0)) Then
@@ -2642,16 +2662,20 @@ CONTAINS
                  Inquire(FILE=trim(file_processed),EXIST=found)
               End Do
               If (.not.found) Then
-                 if (mapl_am_I_root()) Then
-                    write(*,'(a,a,a,a)') ' ERROR: Could not determine upper bounds on ',trim(item%file),' for side ',bSide
-                 end if
-                 _RETURN(ESMF_FAILURE)
+                 !if (mapl_am_I_root()) Then
+                 !   write(*,'(a,a,a,a)') ' ERROR: Could not determine upper bounds on ',trim(item%file),' for side ',bSide
+                 !end if
+                 !_RETURN(ESMF_FAILURE)
+                 write(errmsg,'(4a)') 'Could not determine upper bounds on ',trim(item%file),' for side ',bSide
+                 _FAIL(Trim(errmsg))
               endif
            Else
-              if (mapl_am_I_root()) Then
-                 write(*,'(a,a,a,a)') ' ERROR: Unkown error while scanning ',trim(item%file),' for side ',bSide
-              end if
-              _RETURN(ESMF_FAILURE)
+              !if (mapl_am_I_root()) Then
+              !   write(*,'(a,a,a,a)') ' ERROR: Unkown error while scanning ',trim(item%file),' for side ',bSide
+              !end if
+              !_RETURN(ESMF_FAILURE)
+              write(errmsg,'(4a)') 'Unknown error while scanning ',trim(item%file),' for side ',bSide
+              _FAIL(Trim(errmsg))
            End If
         End If ! end allow extrap
 
@@ -2738,8 +2762,10 @@ CONTAINS
                  End If
               End Do
               if (status /= ESMF_SUCCESS) then
-                 if (mapl_am_I_root()) write(*,*) 'ExtData could not find appropriate file from file template ',trim(item%file),' for side ',bSide
-                 _RETURN(ESMF_FAILURE)
+                 !if (mapl_am_I_root()) write(*,*) 'ExtData could not find appropriate file from file template ',trim(item%file),' for side ',bSide
+                 !_RETURN(ESMF_FAILURE)
+                 write(errmsg,'(4a)') 'ExtData could not find appropriate file from file template ',trim(item%file),' for side ',bSide
+                 _FAIL(Trim(errmsg))
               end if
            else if (bSide == "L") then
               found=.false.
@@ -2777,8 +2803,10 @@ CONTAINS
                  End If
               End Do
               if (status /= ESMF_SUCCESS) then
-                 if (mapl_am_I_root()) write(*,*)'ExtData could not find appropriate file from file template ',trim(item%file),' for side ',bSide
-                 _RETURN(ESMF_FAILURE)
+                 !if (mapl_am_I_root()) write(*,*)'ExtData could not find appropriate file from file template ',trim(item%file),' for side ',bSide
+                 !_RETURN(ESMF_FAILURE)
+                 write(errmsg,'(4a)') 'ExtData could not find appropriate file from file template ',trim(item%file),' for side ',bSide
+                 _FAIL(Trim(errmsg))
               end if
            end if
 
@@ -2819,9 +2847,10 @@ CONTAINS
            call GetBracketTimeOnFile(xCFIO,xTSeries,readTime,bSide,UniFileClim,interpTime,fileTime,tindex,yrOffsetInt=yrOffset+yrOffsetStamp,rc=status)
            found = (status == ESMF_SUCCESS)
            if (.not.found) then
-              if (mapl_am_I_root()) write(*,*)'ExtData could not find bracketing data from file template ',trim(item%file),' for side ',bSide
-              _RETURN(ESMF_FAILURE)
-
+              !if (mapl_am_I_root()) write(*,*)'ExtData could not find bracketing data from file template ',trim(item%file),' for side ',bSide
+              !_RETURN(ESMF_FAILURE)
+              write(errmsg,'(4a)') 'ExtData could not find appropriate file from file template ',trim(item%file),' for side ',bSide
+              _FAIL(Trim(errmsg))
            end if
 
         end if
@@ -4751,6 +4780,9 @@ CONTAINS
             end if
 
             call ESMF_FieldGet(Field,0,farrayPtr=ptr,rc=status)
+            if (status.ne.0) then
+               write(*,'(3a,I6)') 'FIELD FLIP FAIL 00001', trim(item%file), trim(item%var), status
+            end if
             _VERIFY(STATUS)
             allocate(ptemp,source=ptr,stat=status)
             _VERIFY(status)
