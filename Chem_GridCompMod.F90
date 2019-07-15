@@ -1641,6 +1641,7 @@ CONTAINS
     INTEGER                     :: IM          ! # of longitudes on this PET
     INTEGER                     :: JM          ! # of latitudes  on this PET
     INTEGER                     :: LM          ! # of levels     on this PET
+    INTEGER                     :: value_LLTROP  ! # of trop. levels  
     INTEGER                     :: value_LLSTRAT ! # of strat. levels  
     INTEGER                     :: IM_WORLD    ! # of longitudes in global grid
     INTEGER                     :: JM_WORLD    ! # of latitudes  in global grid
@@ -1649,7 +1650,9 @@ CONTAINS
     REAL                        :: tsDyn       ! Dynamic timestep [s]
     CHARACTER(LEN=5)            :: petStr      ! String for PET #
     CHARACTER(LEN=ESMF_MAXSTR)  :: compName    ! Name of gridded component
-    
+   
+    INTEGER                     :: MaxStratLev
+ 
     ! time step error checks 
     REAL                         :: ChemTS, EmisTS
 
@@ -1901,6 +1904,12 @@ CONTAINS
     IF ( am_I_Root ) THEN
        WRITE(*,*) 'Stop KPP if integration fails: ',Input_Opt%KppStop
     ENDIF
+#else
+    If (LM_WORLD == 26) Then
+       value_LLSTRAT = 26
+    Else
+       value_LLSTRAT = 59
+    End If
 #endif
 
     !=======================================================================
@@ -1911,6 +1920,12 @@ CONTAINS
     CALL Init_State_Grid( am_I_Root, State_Grid, RC )
     _ASSERT(RC==GC_SUCCESS,'informative message here')
   
+    If (LM_WORLD == 26) Then
+       value_LLTROP = 20
+    Else
+       value_LLTROP = 40
+    End If
+
     ! Pass grid information obtained from Extract_ to State_Grid
     State_Grid%NX          = IM            ! # lons   on this PET
     State_Grid%NY          = JM            ! # lats   on this PET
@@ -1922,12 +1937,8 @@ CONTAINS
     State_Grid%XMaxOffset  = State_Grid%NX ! X offset from global grid
     State_Grid%YMinOffset  = 1             ! Y offset from global grid
     State_Grid%YMaxOffset  = State_Grid%NY ! Y offset from global grid
-    State_Grid%MaxTropLev  = 40            ! # trop. levels
-#if defined( MODEL_GEOS )
+    State_Grid%MaxTropLev  = value_LLTROP  ! # trop. levels
     State_Grid%MaxStratLev = value_LLSTRAT ! # strat. levels
-#else
-    State_Grid%MaxStratLev = 59            ! # strat. levels
-#endif
 
     ! Call the GIGC initialize routine
     CALL GIGC_Chunk_Init( am_I_Root = am_I_Root,  & ! Are we on the root PET?
