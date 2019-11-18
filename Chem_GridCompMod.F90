@@ -1474,7 +1474,6 @@ CONTAINS
           DIMS               = MAPL_DimsHorzOnly,                   &
                                                             __RC__ )
     ENDDO
-
 #endif
 
     ! Set HEMCO services
