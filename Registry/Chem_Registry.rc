@@ -99,7 +99,80 @@
   TMPU2              |     1	   | xyz | C |    |   |   |	|      | 
   FLASH_DENS         |     1       | xy  |   |    |   |   |     |      | lightning_flash_density
   CONV_DEPTH         |     1       | xy  |   |    |   |   |     |      | convective_cloud_depth
-  XLAIMULTI          | cm2_cm-2	   | xyz | E |    |   |   |	|      | LAI_by_type 
+# XLAIMULTI          | cm2_cm-2	   | xyz | E |    |   |   |	|      | LAI_by_type 
+  XLAI00             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI01             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI02             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI03             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI04             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI05             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI06             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI07             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI08             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI09             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI10             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI11             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI12             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI13             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI14             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI15             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI16             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI17             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI18             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI19             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI20             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI21             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI22             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI23             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI24             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI25             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI26             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI27             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI28             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI29             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI30             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI31             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI32             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI33             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI34             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI35             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI36             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI37             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI38             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI39             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI40             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI41             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI42             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI43             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI44             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI45             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI46             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI47             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI48             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI49             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI50             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI51             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI52             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI53             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI54             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI55             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI56             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI57             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI58             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI59             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI60             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI61             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI62             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI63             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI64             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI65             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI66             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI67             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI68             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI69             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI70             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI71             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
+  XLAI72             | cm2_cm-2	   | xy  |   |    |   |   |	|      | LAI_single 
 # -------------------|-------------|-----|---|----|---|---|-----|------|--------------------------
 </ImportSpec>
 
