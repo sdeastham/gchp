@@ -4699,6 +4699,7 @@ CONTAINS
 
   real, pointer :: ptrF(:,:,:),ptrR(:,:,:)
   integer :: lm_in,lm_out,i
+  integer :: ub_in,ub_out,lb_in,lb_out
 
   Iam = "MAPL_ExtDataFillField"
 
@@ -4709,21 +4710,41 @@ CONTAINS
   ptrF = 0.0
   lm_in= size(ptrR,3)
   lm_out = size(ptrF,3)
+  lb_in  = lbound(ptrR,3)
+  ub_in  = ubound(ptrR,3)
+  lb_out = lbound(ptrF,3)
+  ub_out = ubound(ptrF,3)
   do i=1,lm_in
      if ( item%levPosAttrUp ) then
         ! if positive attribute present and 'up' then do not flip during fill;
         ! flip will be done later on 72-level array in MAPL_ExtDataFlipVertical.
-        ptrF(:,:,lm_out-lm_in+i)=ptrR(:,:,i)
+        ptrF(:,:,ub_out-lm_in+i)=ptrR(:,:,lb_in+i-1)
      else
         ! if positive attribute missing or not up, flip the array during fill
         ! for compatibility with GCHP. This default behavior will result in
         ! mishandling of reduced level files in GEOS and is GCHP-only.
-        ptrF(:,:,lm_out-i+1)=ptrR(:,:,i)
+        ptrF(:,:,ub_out-i+1)=ptrR(:,:,lb_in+i-1)
      endif
   enddo
+  !do i=1,lm_in
+  !   if ( item%levPosAttrUp ) then
+  !      ! if positive attribute present and 'up' then do not flip during fill;
+  !      ! flip will be done later on 72-level array in MAPL_ExtDataFlipVertical.
+  !      ptrF(:,:,lm_out-lm_in+i)=ptrR(:,:,i)
+  !   else
+  !      ! if positive attribute missing or not up, flip the array during fill
+  !      ! for compatibility with GCHP. This default behavior will result in
+  !      ! mishandling of reduced level files in GEOS and is GCHP-only.
+  !      ptrF(:,:,lm_out-i+1)=ptrR(:,:,i)
+  !   endif
+  !enddo
 
+  !if ( Ext_Debug > 0 .and. mapl_am_i_root() ) then
+  !    print *, '   MAPL_ExtDataFillField: filling reduced level input to 72 level array for ', trim(item%name)
+  !endif
   if ( Ext_Debug > 0 .and. mapl_am_i_root() ) then
-      print *, '   MAPL_ExtDataFillField: filling reduced level input to 72 level array for ', trim(item%name)
+      write(*,'(2(a,I4),2a,6(x,I4))') '   --> MAPL_ExtDataFillField: filling ', lm_in, ' level input to ', lm_out, ' levels for ', &
+          trim(item%name), lb_in, ub_in, lb_out, ub_out
   endif
 
 
@@ -4743,7 +4764,7 @@ CONTAINS
       type(ESMF_Field) :: Field,field1,field2
       real, pointer    :: ptr(:,:,:)
       real, allocatable :: ptemp(:,:,:)
-      integer :: i,lm
+      integer :: i,lm,lb,ub
 
       if (item%flip) then
 
@@ -4762,12 +4783,16 @@ CONTAINS
             allocate(ptemp,source=ptr,stat=status)
             _VERIFY(status)
             lm = size(ptr,3)
-            ptr(:,:,lm:1:-1) = ptemp(:,:,1:lm:+1)
+            ub = ubound(ptr,3)
+            lb = lbound(ptr,3)
+            !ptr(:,:,lm:1:-1) = ptemp(:,:,1:lm:+1)
+            ptr(:,:,ub:lb:-1) = ptemp(:,:,lb:ub:+1)
 
             call ESMF_FieldGet(Field2,0,farrayPtr=ptr,rc=status)
             _VERIFY(STATUS)
             ptemp=ptr
-            ptr(:,:,lm:1:-1) = ptemp(:,:,1:lm:+1)
+            !ptr(:,:,lm:1:-1) = ptemp(:,:,1:lm:+1)
+            ptr(:,:,ub:lb:-1) = ptemp(:,:,lb:ub:+1)
 
             deallocate(ptemp)
 
@@ -4787,13 +4812,18 @@ CONTAINS
             allocate(ptemp,source=ptr,stat=status)
             _VERIFY(status)
             lm = size(ptr,3)
-            ptr(:,:,lm:1:-1) = ptemp(:,:,1:lm:+1)
+            ub = ubound(ptr,3)
+            lb = lbound(ptr,3)
+            !ptr(:,:,lm:1:-1) = ptemp(:,:,1:lm:+1)
+            ptr(:,:,ub:lb:-1) = ptemp(:,:,lb:ub:+1)
             deallocate(ptemp)
 
-            if ( Ext_Debug > 0 .and. mapl_am_i_root() ) then
-                print *, '   --> MAPL_ExtDataFlipVertical: vertically flipping all levels for ', trim(item%name)
-            endif
          end if
+
+         if ( Ext_Debug > 0 .and. mapl_am_i_root() ) then
+             write(*,'(2a,3(x,I4))') '   --> MAPL_ExtDataFlipVertical: vertically flipping all levels for ', &
+                 trim(item%name), lb, ub, lm
+         endif
 
       end if
 
