@@ -160,6 +160,8 @@ MODULE Chem_GridCompMod
   ! Memory debug level
   INTEGER                          :: MemDebugLevel
 
+  Logical                          :: Met_Inverted
+
 #if defined( MODEL_GEOS )
   ! GEOS-5 only
   ! Flag to initialize species concentrations from external fields. Read 
@@ -1667,7 +1669,10 @@ CONTAINS
     TYPE(ESMF_Time)              :: CurrTime    ! Current time of the ESMF clock
     TYPE(MAPL_MetaComp), POINTER :: STATE => NULL()
     REAL(ESMF_KIND_R8), POINTER  :: Ptr3D_R8(:,:,:) => NULL()
+    INTEGER :: N_BAD, L, J
 #endif
+
+    INTEGER                      :: Met_Inverted_Int
 
     __Iam__('Initialize_')
 
@@ -1740,6 +1745,12 @@ CONTAINS
                                  Label="MEMORY_DEBUG_LEVEL:" , RC=STATUS)
     _VERIFY(STATUS)
 
+    ! Does the met have the right vertical attribute?
+    call ESMF_ConfigGetAttribute(GeosCF, Met_Inverted_Int, &
+                                 Label="MET_INVERTED:" , RC=STATUS)
+    _VERIFY(STATUS)
+
+    Met_Inverted = (Met_Inverted_Int .ne. 0)
 
     ! Name of logfile for stdout redirect
     CALL ESMF_ConfigGetAttribute( GeosCF, logFile,              &

@@ -42,7 +42,6 @@
   State_Met%GWETROOT            = GWETROOT                   ! 1
   State_Met%GWETTOP             = GWETTOP                    ! 1
   State_Met%LAI                 = LAI                        ! 1  
-  State_Met%OMEGA               = OMEGA                      ! Pa s-1
   State_Met%PARDR               = PARDR                      ! W/m2
   State_Met%PARDF               = PARDF                      ! W/m2
   State_Met%PBLH                = PBLH                       ! m
@@ -50,8 +49,6 @@
   State_Met%PS1_WET             = PS1                        ! hPa
   State_Met%PS2_WET             = PS2                        ! hPa
   State_Met%SLP                 = SLP                        ! hPa
-  State_Met%TMPU1               = TMPU1
-  State_Met%TMPU2               = TMPU2
   State_Met%TS                  = TS                         ! K
   State_Met%TSKIN               = TSKIN                      ! K
   State_Met%SWGDN               = RADSWG                     ! W/m2
@@ -60,10 +57,8 @@
   State_Met%SNOMAS              = SNOMAS                     ! kg/m2
   State_Met%SUNCOS              = zenith                     ! unitless
   State_Met%SUNCOSmid           = zenith                     ! 1
-  State_Met%U                   = ULL                        ! m/s
   State_Met%U10M                = U10M                       ! m/s
   State_Met%USTAR               = USTAR                      ! m/s
-  State_Met%V                   = VLL                        ! m/s
   State_Met%V10M                = V10M                       ! m/s
   State_Met%Z0                  = Z0                         ! m
 
@@ -89,11 +84,20 @@
   !=========================================================================
 
   ! kg/m2/s
-  State_Met%CMFMC  (:,:,1:State_Grid%NZ+1) = CMFMC  (:,:,0:State_Grid%NZ)
-  State_Met%PFICU  (:,:,1:State_Grid%NZ+1) = PFICU  (:,:,0:State_Grid%NZ)
-  State_Met%PFILSAN(:,:,1:State_Grid%NZ+1) = PFILSAN(:,:,0:State_Grid%NZ)
-  State_Met%PFLCU  (:,:,1:State_Grid%NZ+1) = PFLCU  (:,:,0:State_Grid%NZ)
-  State_Met%PFLLSAN(:,:,1:State_Grid%NZ+1) = PFLLSAN(:,:,0:State_Grid%NZ)
+  If (Met_Inverted) Then
+     State_Met%CMFMC  (:,:,1:State_Grid%NZ+1) = CMFMC  (:,:,0:State_Grid%NZ)
+     State_Met%PFICU  (:,:,1:State_Grid%NZ+1) = PFICU  (:,:,0:State_Grid%NZ)
+     State_Met%PFILSAN(:,:,1:State_Grid%NZ+1) = PFILSAN(:,:,0:State_Grid%NZ)
+     State_Met%PFLCU  (:,:,1:State_Grid%NZ+1) = PFLCU  (:,:,0:State_Grid%NZ)
+     State_Met%PFLLSAN(:,:,1:State_Grid%NZ+1) = PFLLSAN(:,:,0:State_Grid%NZ)
+  Else
+     ! MAPL data is oriented with TOA = level 1
+     State_Met%CMFMC  (:,:,1:State_Grid%NZ+1) = CMFMC  (:,:,State_Grid%NZ:0:-1)
+     State_Met%PFICU  (:,:,1:State_Grid%NZ+1) = PFICU  (:,:,State_Grid%NZ:0:-1)
+     State_Met%PFILSAN(:,:,1:State_Grid%NZ+1) = PFILSAN(:,:,State_Grid%NZ:0:-1)
+     State_Met%PFLCU  (:,:,1:State_Grid%NZ+1) = PFLCU  (:,:,State_Grid%NZ:0:-1)
+     State_Met%PFLLSAN(:,:,1:State_Grid%NZ+1) = PFLLSAN(:,:,State_Grid%NZ:0:-1)
+  End If
 
   ! NOTE: PLE is reversed in the vertical! Note that this will end up
   ! affecting DELP and therefore State_Met%PEDGE_DRY, but that the 
@@ -128,27 +132,61 @@
   !=========================================================================
   ! Three-dimensional fields on level centers
   !=========================================================================
-  State_Met%CLDF                = CLDF                       ! 1
-  State_Met%DTRAIN              = DTRAIN                     ! kg/m2/s
-  State_Met%DQRCU               = DQRCU                      ! kg/kg/s
-  State_Met%DQRLSAN             = DQRLSAN                    ! kg/kg/s
-  State_Met%QI                  = QI                         ! kg/kg
-  State_Met%QL                  = QL                         ! kg/kg
-  State_Met%RH                  = RH      * 1d2              ! 1 -> %
-  State_Met%TAUCLI              = TAUCLI                     ! 1
-  State_Met%TAUCLW              = TAUCLW                     ! 1
-  State_Met%REEVAPCN            = REEVAPCN                   ! kg/kg/s
-  State_Met%REEVAPLS            = REEVAPLS                   ! kg/kg/s
+  If (Met_Inverted) Then
+     State_Met%CLDF                = CLDF                       ! 1
+     State_Met%DTRAIN              = DTRAIN                     ! kg/m2/s
+     State_Met%DQRCU               = DQRCU                      ! kg/kg/s
+     State_Met%DQRLSAN             = DQRLSAN                    ! kg/kg/s
+     State_Met%QI                  = QI                         ! kg/kg
+     State_Met%QL                  = QL                         ! kg/kg
+     State_Met%RH                  = RH      * 1d2              ! 1 -> %
+     State_Met%TAUCLI              = TAUCLI                     ! 1
+     State_Met%TAUCLW              = TAUCLW                     ! 1
+     State_Met%REEVAPCN            = REEVAPCN                   ! kg/kg/s
+     State_Met%REEVAPLS            = REEVAPLS                   ! kg/kg/s
 
-  ! These fields are set to match the GCC conventions and to ensure that 
-  ! transport is correctly implemented.
-  State_Met%SPHU                =(SPHU1+SPHU2)*0.5d3         ! kg/kg -> g/kg
-  State_Met%SPHU1               = SPHU1       *1.0d3         ! kg/kg -> g/kg
-  State_Met%SPHU2               = SPHU2       *1.0d3         ! kg/kg -> g/kg
-  State_Met%T                   =(TMPU1+TMPU2)*0.5d0         ! K
+     ! These fields are set to match the GCC conventions and to ensure that 
+     ! transport is correctly implemented.
+     State_Met%SPHU1               = SPHU1*1.0d3                ! kg/kg -> g/kg
+     State_Met%SPHU2               = SPHU2*1.0d3                ! kg/kg -> g/kg
+      
+     ! Previously misclassified
+     State_Met%TMPU1               = TMPU1
+     State_Met%TMPU2               = TMPU2
+     State_Met%OMEGA               = OMEGA                      ! Pa s-1
+     State_Met%U                   = ULL                        ! m/s
+     State_Met%V                   = VLL                        ! m/s
+  Else
+     State_Met%CLDF                = CLDF    (:,:,State_Grid%NZ:1:-1)       ! 1
+     State_Met%DTRAIN              = DTRAIN  (:,:,State_Grid%NZ:1:-1)       ! kg/m2/s
+     State_Met%DQRCU               = DQRCU   (:,:,State_Grid%NZ:1:-1)       ! kg/kg/s
+     State_Met%DQRLSAN             = DQRLSAN (:,:,State_Grid%NZ:1:-1)       ! kg/kg/s
+     State_Met%QI                  = QI      (:,:,State_Grid%NZ:1:-1)       ! kg/kg
+     State_Met%QL                  = QL      (:,:,State_Grid%NZ:1:-1)       ! kg/kg
+     State_Met%RH                  = RH      (:,:,State_Grid%NZ:1:-1) * 1d2 ! 1 -> %
+     State_Met%TAUCLI              = TAUCLI  (:,:,State_Grid%NZ:1:-1)       ! 1
+     State_Met%TAUCLW              = TAUCLW  (:,:,State_Grid%NZ:1:-1)       ! 1
+     State_Met%REEVAPCN            = REEVAPCN(:,:,State_Grid%NZ:1:-1)       ! kg/kg/s
+     State_Met%REEVAPLS            = REEVAPLS(:,:,State_Grid%NZ:1:-1)       ! kg/kg/s
 
-  ! Create total optical depth field                         ! 1
+     ! These fields are set to match the GCC conventions and to ensure that 
+     ! transport is correctly implemented.
+     State_Met%SPHU1               = SPHU1(:,:,State_Grid%NZ:1:-1)*1.0d3 ! kg/kg -> g/kg
+     State_Met%SPHU2               = SPHU2(:,:,State_Grid%NZ:1:-1)*1.0d3 ! kg/kg -> g/kg
+
+     ! Previously misclassified
+     State_Met%TMPU1               = TMPU1(:,:,State_Grid%NZ:1:-1) 
+     State_Met%TMPU2               = TMPU2(:,:,State_Grid%NZ:1:-1) 
+     State_Met%OMEGA               = OMEGA(:,:,State_Grid%NZ:1:-1) ! Pa s-1
+     State_Met%U                   = ULL  (:,:,State_Grid%NZ:1:-1) ! m/s
+     State_Met%V                   = VLL  (:,:,State_Grid%NZ:1:-1) ! m/s
+  End If
+
+  ! Derived fields can be produced without worrying about orientation
+  ! Create total optical depth field
   State_Met%OPTD                = State_Met%TAUCLI + State_Met%TAUCLW
+  State_Met%T                   =(State_Met%TMPU1  + State_Met%TMPU2) * 0.5d0
+  State_Met%SPHU                =(State_Met%SPHU1  + State_Met%SPHU2) * 0.5d0
 
   !=========================================================================
   ! Offline lightning fields
